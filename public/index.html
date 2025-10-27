@@ -1,15 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LazyLogic</title>
-  <style>
-    body { font-family: sans-serif; text-align: center; padding-top: 20vh; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LazyLogic — Automate Everything</title>
+<meta name="theme-color" content="#0b0f17" />
+<style>
+  :root{
+    --bg:#0b0f17;                /* deep tech black */
+    --ink:#e6ebff;               /* soft off-white */
+    --muted:#9fb3ff;             /* cool blue text */
+    --accent:#8257ff;            /* purple glow */
+    --accent-2:#35c2ff;          /* cyan glow */
+    --coffee:#c48a4a;            /* warm coffee accent */
+    --card:#121828;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+    color:var(--ink);
+    background: radial-gradient(1200px 800px at 75% -10%, rgba(53,194,255,0.12), transparent 55%),
+                radial-gradient(900px 600px at 10% 20%, rgba(130,87,255,0.15), transparent 60%),
+                linear-gradient(180deg, #0b0f17 0%, #0a0f1a 100%);
+    overflow:hidden;
+  }
+  /* animated gradient beams */
+  .beams::before,.beams::after{
+    content:"";
+    position:absolute; inset:-30%;
+    background: conic-gradient(from 0deg, transparent 0 330deg, rgba(130,87,255,.18) 360deg);
+    filter: blur(70px);
+    animation: spin 26s linear infinite;
+    pointer-events:none;
+    mix-blend-mode:screen;
+  }
+  .beams::after{
+    background: conic-gradient(from 180deg, transparent 0 330deg, rgba(53,194,255,.16) 360deg);
+    animation-duration: 34s;
+    animation-direction: reverse;
+  }
+  @keyframes spin{to{transform:rotate(1turn)}}
+
+  /* layout */
+  .wrap{
+    position:relative;
+    height:100%;
+    display:grid;
+    grid-template-rows: auto 1fr auto;
+  }
+  header,footer{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; padding:18px 24px; position:relative; z-index:2;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    border-bottom:1px solid rgba(130,87,255,0.12);
+  }
+  nav a{
+    color:var(--muted); text-decoration:none; margin:0 12px; font-weight:600;
+  }
+  nav a:hover{color:var(--ink)}
+  .brand{
+    display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:.2px;
+  }
+  .brand .dot{width:10px; height:10px; border-radius:50%; background: radial-gradient(circle at 30% 30%, var(--accent-2), var(--accent)); box-shadow:0 0 16px var(--accent-2);}
+  .stage{
+    position:relative; z-index:2;
+    display:grid; place-items:center; padding:32px; height:100%;
+  }
+  .hero{
+    width:min(1100px, 92vw);
+    display:grid; grid-template-columns: 1.1fr .9fr; gap:38px; align-items:center;
+  }
+  @media (max-width:900px){ .hero{grid-template-columns: 1fr; text-align:center} }
+  h1{
+    font-size: clamp(32px, 5vw, 64px);
+    line-height:1.05; margin:0 0 10px;
+    background: linear-gradient(90deg, #fff 0%, #cfe6ff 50%, #aeb9ff 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow: 0 0 14px rgba(130,87,255,.25);
+  }
+  .tag{color:var(--muted); font-size:clamp(14px,1.6vw,18px); margin:0 0 20px}
+  .cta{
+    display:flex; gap:12px; flex-wrap:wrap;
+  }
+  .btn{
+    appearance:none; border:0; cursor:pointer; border-radius:12px;
+    padding:14px 18px; font-weight:800; letter-spacing:.2px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px rgba(0,0,0,.35);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-primary{
+    color:#0a0f1a; background:
+      radial-gradient(60% 120% at 0% 0%, var(--accent-2), transparent 60%),
+      radial-gradient(100% 140% at 100% 0%, var(--accent), transparent 60%),
+      linear-gradient(180deg, #e8f6ff 0%, #b5d7ff 100%);
+  }
+  .btn-primary:hover{ transform: translateY(-2px); box-shadow: 0 18px 40px rgba(130,87,255,.28); }
+  .btn-ghost{ color:var(--ink); background:rgba(255,255,255,.05) }
+  .btn-ghost:hover{ transform: translateY(-2px); box-shadow: 0 14px 32px rgba(53,194,255,.22); }
+
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:16px; padding:18px 16px; display:inline-flex; gap:10px; align-items:center;
+    color:var(--muted); font-weight:600;
+  }
+  .coffee-dot{width:8px;height:8px;border-radius:50%;background:radial-gradient(circle at 40% 40%, #ffd7a1, var(--coffee)); box-shadow:0 0 12px rgba(196,138,74,.6)}
+  /* robot panel */
+  .robot-wrap{
+    position:relative; perspective:1000px; isolation:isolate;
+  }
+  .panel{
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    border:1px solid rgba(130,87,255,.25);
+    border-radius:22px; padding:18px;
+    box-shadow: 0 40px 120px rgba(130,87,255,.20), inset 0 0 50px rgba(53,194,255,.05);
+    transform-style:preserve-3d; transition: transform .2s ease;
+  }
+  .robot{
+    width:min(520px, 85vw); aspect-ratio: 1.2/1;
+    object-fit: contain; display:block; margin:auto; filter: drop-shadow(0 10px 40px rgba(53,194,255,.25));
+    transform: translateZ(20px);
+  }
+  .badge{
+    position:absolute; right:-10px; top:-10px;
+    background: linear-gradient(135deg, var(--coffee), #ffcc88);
+    color:#1a1006; font-weight:900; border-radius:14px; padding:10px 12px; font-size:12px;
+    box-shadow: 0 10px 30px rgba(196,138,74,.45);
+    transform: translateZ(40px) rotate(-6deg);
+  }
+  footer{
+    border-top:1px solid rgba(130,87,255,0.12);
+    background: linear-gradient(0deg, rgba(255,255,255,0.02), transparent);
+    color:var(--muted); gap:16px; justify-content:center; flex-wrap:wrap;
+  }
+  /* canvas */
+  #fx{position:absolute; inset:0; z-index:1; pointer-events:none;}
+</style>
 </head>
 <body>
-  <h1>🚀 LazyLogic is Live</h1>
-  <p>Your optimized static site is deployed successfully!</p>
+<canvas id="fx"></canvas>
+<div class="beams"></div>
+<div class="wrap">
+  <header>
+    <div class="brand"><span class="dot"></span><span>LazyLogic</span></div>
+    <nav>
+      <a href="https://lazylogic.org">Home</a>
+      <a href="/pricing">Pricing</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+    </nav>
+  </header>
+
+  <main class="stage">
+    <div class="hero">
+      <section>
+        <div class="card"><span class="coffee-dot"></span><span>Relaxed robot energy. Ruthless automation.</span></div>
+        <h1>Automate everything.<br/>Ship while you sip.</h1>
+        <p class="tag">World-class, zero-friction ops: pipelines, deploys, UI polish, and the boring bits — on autopilot.</p>
+        <div class="cta">
+          <a class="btn btn-primary" href="/get-started">Get Started</a>
+          <a class="btn btn-ghost" href="/docs">Docs</a>
+        </div>
+      </section>
+
+      <section class="robot-wrap" id="tilt">
+        <div class="panel">
+          <!-- Replace this file with your real robot image to preserve brand -->
+          <img class="robot" src="assets/reclining-robot.png" alt="Relaxed robot sipping coffee in a recliner" />
+        </div>
+        <div class="badge">Coffee Powered</div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <span>© <span id="y"></span> LazyLogic.org</span> •
+    <span>Built for speed · Blue/Purple hues · Coffee accent</span>
+  </footer>
+</div>
+
+<script>
+  // Year
+  document.getElementById('y').textContent = new Date().getFullYear();
+
+  // Subtle 3D tilt on the robot panel
+  const tilt = document.getElementById('tilt');
+  (function(){
+    let rx=0, ry=0;
+    function handle(e){
+      const r = tilt.getBoundingClientRect();
+      const x = (e.clientX - r.left)/r.width, y=(e.clientY - r.top)/r.height;
+      ry = (x-0.5)*10; rx = (0.5-y)*8;
+      tilt.querySelector('.panel').style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+    }
+    tilt.addEventListener('mousemove',handle);
+    tilt.addEventListener('mouseleave',()=> tilt.querySelector('.panel').style.transform='rotateX(0) rotateY(0)');
+  })();
+
+  // Lightweight canvas particles (blue/purple drift + coffee sparks)
+  (function(){
+    const c=document.getElementById('fx'), ctx=c.getContext('2d');
+    let W=innerWidth,H=innerHeight; c.width=W; c.height=H;
+    const parts = Array.from({length: 120}, (_,i)=>({
+      x: Math.random()*W,
+      y: Math.random()*H,
+      r: Math.random()*2+0.6,
+      vx: (Math.random()-.5)*0.25,
+      vy: (Math.random()-.5)*0.25,
+      hue: i%9===0 ? 'rgba(196,138,74,.75)' : (i%2 ? 'rgba(130,87,255,.55)' : 'rgba(53,194,255,.55)')
+    }));
+    function tick(){
+      ctx.clearRect(0,0,W,H);
+      for(const p of parts){
+        p.x+=p.vx; p.y+=p.vy;
+        if(p.x<0||p.x>W) p.vx*=-1; if(p.y<0||p.y>H) p.vy*=-1;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle=p.hue; ctx.fill();
+      }
+      // faint connective lines
+      for(let i=0;i<parts.length;i++){
+        for(let j=i+1;j<i+30 && j<parts.length;j++){
+          const a=parts[i], b=parts[j];
+          const dx=a.x-b.x, dy=a.y-b.y, d=dx*dx+dy*dy;
+          if(d<220*220){
+            ctx.strokeStyle='rgba(130,87,255,'+(0.07- d/(220*220)*0.07)+')';
+            ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+    addEventListener('resize',()=>{W=innerWidth;H=innerHeight;c.width=W;c.height=H});
+    tick();
+  })();
+
+  // PWA: register if present
+  if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js').catch(()=>{}); }
+</script>
 </body>
 </html>
