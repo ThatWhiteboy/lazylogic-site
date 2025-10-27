@@ -1,40 +1,28 @@
-name: 🚀 LazyLogic Deploy to Netlify
-
+name: 🚀 LazyLogic Static Deploy to Netlify (Optimized)
 on:
   push:
     branches: [ master ]
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: 🧾 Checkout repo
         uses: actions/checkout@v3
-
-      - name: ⚙️ Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-
-      - name: 📦 Install dependencies
-        run: npm install
-
-      - name: 🏗️ Build site
-        run: npm run build
-
-      - name: ✅ Deploy to Netlify
+      - name: ⚙️ Install html-minifier and terser
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y npm
+          npm install -g html-minifier-terser clean-css-cli terser
+      - name: 🧹 Minify HTML, CSS, JS
+        run: |
+          find public -name '*.html' -exec html-minifier-terser --collapse-whitespace --remove-comments --minify-js true --minify-css true -o {} {} \;
+          find public -name '*.css' -exec cleancss -o {} {} \;
+          find public -name '*.js' -exec terser -c -m -o {} -- {} \;
+      - name: 🚀 Deploy to Netlify
         uses: nwtgck/actions-netlify@v2
         with:
-          publish-dir: ./dist
+          publish-dir: ./public
           production-deploy: true
-          alias: ''
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN || 'MISSING_NETLIFY_AUTH_TOKEN' }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID || 'MISSING_NETLIFY_SITE_ID' }}
-
-      - name: 🔐 Check for missing secrets
-        if: ${{ env.NETLIFY_AUTH_TOKEN == 'MISSING_NETLIFY_AUTH_TOKEN' || env.NETLIFY_SITE_ID == 'MISSING_NETLIFY_SITE_ID' }}
-        run: |
-          echo "❌ WARNING: Netlify deploy secrets are missing."
-          echo "Please set NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID in your repo's GitHub Secrets."
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
