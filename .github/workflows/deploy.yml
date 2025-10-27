@@ -29,3 +29,22 @@ jobs:
 
       - name: 🧩 Post-Build Enhancements
         run: bash scripts/postbuild.sh
+   - name: 📱 Send NTFY notification (success)
+     if: success()
+     run: |
+       curl -d "✅ LazyLogic deploy successful — branch ${{ github.ref_name }} deployed successfully." \
+       -H "Title: LazyLogic Deploy Success" \
+       -H "Priority: high" \
+       -H "Tags: rocket,coffee,white_check_mark" \
+       -H "Click: https://lazylogic.netlify.app" \
+       https://ntfy.sh/lazylogic-global
+
+   - name: ⚠️ Send NTFY notification (failure)
+     if: failure()
+     run: |
+       curl -d "❌ LazyLogic deploy failed on branch ${{ github.ref_name }} — check logs." \
+       -H "Title: LazyLogic Deploy Failed" \
+       -H "Priority: urgent" \
+       -H "Tags: warning,skull" \
+       -H "Click: https://github.com/${{ github.repository }}/actions" \
+       https://ntfy.sh/lazylogic-global
