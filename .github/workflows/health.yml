@@ -1,0 +1,54 @@
+name: 🩺 LazyLogic Self-Healing Watcher (Termux Optimized)
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  heal:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🧾 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: 🔍 Check LazyLogic Domains
+        id: check
+        shell: bash
+        run: |
+          FAIL=0
+          for site in https://lazylogic.netlify.app https://lazylogic.org; do
+            echo "🔎 Checking $site ..."
+            resp="$(curl -fsSL --max-time 20 "$site" || true)"
+            if [ -z "$resp" ]; then echo "❌ Empty response"; FAIL=1; fi
+            echo "$resp" | grep -q "index.html 200" && { echo "⚠️ Found stray HTML 200 text"; FAIL=1; }
+          done
+          echo "fail=$FAIL" >> $GITHUB_OUTPUT
+
+      - name: ✅ Notify Success via NTFY
+        if: steps.check.outputs.fail == '0'
+        run: |
+          curl -fsS -d "✅ LazyLogic verified clean on both domains." \
+            -H "Title: LazyLogic Verified" \
+            -H "Tags: rocket,coffee,white_check_mark" \
+            https://ntfy.sh/lazylogic-global || true
+
+      - name: 🚨 Auto-Rollback & Alert via NTFY
+        if: steps.check.outputs.fail == '1'
+        run: |
+          git config user.name "lazylogic-autoheal"
+          git config user.email "autoheal@users.noreply.github.com"
+          git fetch origin master
+          git checkout -B master origin/master
+          git reset --hard HEAD~1
+          git push origin HEAD:master --force
+          curl -fsS -d "⚠️ Detected site issue — rolled back to previous commit and redeployed." \
+            -H "Title: LazyLogic Auto-Heal Triggered" \
+            -H "Priority: high" \
+            -H "Tags: warning,skull" \
+            https://ntfy.sh/lazylogic-global || true
