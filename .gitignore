@@ -3,3 +3,5 @@ dist/
 *.zip
 *.rar
 *.tar.gz
+# Local Netlify folder
+.netlify

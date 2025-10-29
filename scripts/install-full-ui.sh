@@ -1,3 +1,8 @@
+#!/usr/bin/env bash
+set -e
+echo "🎨 Building LazyLogic full UI with animated background + chatbot + analytics..."
+mkdir -p public/assets
+cat > public/index.html <<'HTML'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,3 +53,6 @@ inp.addEventListener('keypress',e=>{
 <script async defer data-domain="lazylogic.org" src="https://plausible.io/js/script.js"></script>
 </body>
 </html>
+HTML
+echo "/* /index.html 200" > public/_redirects
+netlify deploy --prod --dir=public --message "🚀 Full animated UI + chatbot deploy"
