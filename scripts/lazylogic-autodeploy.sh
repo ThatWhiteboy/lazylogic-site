@@ -1,3 +1,13 @@
+#!/usr/bin/env bash
+set -e
+echo "⚙️  Running LazyLogic Universal Auto-Deploy..."
+
+# 1️⃣ Prep
+mkdir -p public/{assets,about,contact,services,ai-tools,pricing} netlify/functions
+echo "🌐 Preparing public structure..."
+
+# 2️⃣ Generate neon multi-page UI with chat widget
+cat > public/index.html <<'HTML'
 <!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LazyLogic — Automate Everything</title>
@@ -31,3 +41,26 @@ document.getElementById('msg').addEventListener('keypress',async e=>{
  const j=await r.json();log.innerHTML+=`<div><b>Bot:</b> ${j.reply}</div>`;log.scrollTop=log.scrollHeight;}
 });
 </script></body></html>
+HTML
+echo "/* /index.html 200" > public/_redirects
+
+# 3️⃣ Chat Function
+cat > netlify/functions/chat.js <<'JS'
+export async function handler(event){
+  const {q=''}=JSON.parse(event.body||'{}');
+  return new Response(JSON.stringify({reply:`Got it: ${q||'Say something to start.'}`}),{
+    headers:{'content-type':'application/json','access-control-allow-origin':'*'}
+  });
+}
+JS
+
+# 4️⃣ Commit + deploy
+git add . && git commit -m "🚀 Automated LazyLogic Deploy" || true
+git pull --rebase origin master || true
+git push origin master || true
+
+# 5️⃣ Deploy
+echo "🚀 Deploying to Netlify..."
+netlify link --id 7a76027f-4466-40a2-9b72-6eb427b7eb31 || true
+netlify deploy --prod --dir=public --message "🤖 Auto full deploy (LazyLogic Universal)"
+echo "✅ Deployment complete!"
