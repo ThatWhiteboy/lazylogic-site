@@ -4,7 +4,7 @@
 
 # 1. HARDCODED CREDENTIALS (AUTO-FILLED)
 SUPABASE_URL="https://ntbujdihrfunfxajhzhs.supabase.co"
-SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50YnVqZGlocmZ1bmZ4YWpoemhzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODc5NzU5OSwiZXhwIjoyMDg0MzczNTk5fQ.ZrDASOrTH81XgqAyFu7cws9Jdj7lo1BRPrbbO0imsCw"
+SUPABASE_KEY="${SUPABASE_SERVICE_ROLE_KEY}"
 N8N_WEBHOOK="http://localhost:5678/webhook/titan-dispatch"
 
 echo "=========================================="

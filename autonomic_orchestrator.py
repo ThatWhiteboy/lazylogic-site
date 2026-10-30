@@ -1,8 +1,9 @@
+import os
 import time, subprocess, os
 from supabase import create_client
 
 URL = "https://ntbujdihrfunfxajhzhs.supabase.co"
-KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50YnVqZGlocmZ1bmZ4YWpoemhzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODc5NzU5OSwiZXhwIjoyMDg0MzczNTk5fQ.ZrDASOrTH81XgqAyFu7cws9Jdj7lo1BRPrbbO0imsCw"
+KEY = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
 REPO_PATH = os.path.expanduser("~/lazylogic")
 
 def run_worker():

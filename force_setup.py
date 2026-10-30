@@ -1,11 +1,12 @@
+import os
 import requests
 import json
 import sys
 
 # --- HARDCODED KEYS ---
-N8N_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjOTZkMTAxMC03YjExLTRmNWMtYTk3OS00Y2I3YjI0Nzc5NWQiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiMjM0OTI4MjYtYTM5YS00MjkxLTkwMTgtMWI0MjZhOTAzYmIxIiwiaWF0IjoxNzcwNzAyMDIwLCJleHAiOjE3NzMyODgwMDB9.4Q1-PAKaottHxoxaJcbB3iB88amc3AOOLX-zDjLMMmg"
+N8N_KEY = os.environ["N8N_API_KEY"]
 SUPA_URL = "https://ntbujdihrfunfxajhzhs.supabase.co"
-SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50YnVqZGlocmZ1bmZ4YWpoemhzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODc5NzU5OSwiZXhwIjoyMDg0MzczNTk5fQ.ZrDASOrTH81XgqAyFu7cws9Jdj7lo1BRPrbbO0imsCw"
+SUPA_KEY = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
 
 API_URL = "http://localhost:5678/api/v1"
 HEADERS = {"X-N8N-API-KEY": N8N_KEY}
